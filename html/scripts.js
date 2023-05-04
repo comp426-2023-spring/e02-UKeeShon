@@ -76,22 +76,12 @@ function play() {
     const hint__shade = document.getElementById('hint__shade')
 
     if (gameType == null) {
-        hint.textContent = '请选择游戏'
-        hint__shade.style.display = 'block'
-
-        setTimeout(() => {
-            hint__shade.style.display = 'none'
-        }, 1000);
+        msg('Please select the game')
         return
     }
 
     if (gestureType == null) {
-        hint.textContent = '请选择手势'
-        hint__shade.style.display = 'block'
-
-        setTimeout(() => {
-            hint__shade.style.display = 'none'
-        }, 1000);
+        msg('Please select gesture')
         return
     }
 
@@ -102,6 +92,10 @@ function play() {
                 you.textContent = res.player
                 youOpponent.textContent = res.opponent
                 result.textContent = res.result
+
+                optionsPage.style.display = 'none'
+                resultPage.style.display = 'block'
+                playBtn.style.display = 'none'
             })
         }
 
@@ -110,12 +104,14 @@ function play() {
                 you.textContent = res.player
                 youOpponent.textContent = res.opponent
                 result.textContent = res.result
+
+
+                optionsPage.style.display = 'none'
+                resultPage.style.display = 'block'
+                playBtn.style.display = 'none'
             })
         }
 
-        optionsPage.style.display = 'none'
-        resultPage.style.display = 'block'
-        playBtn.style.display = 'none'
 
     }
 
@@ -152,9 +148,8 @@ function startOver() {
 
 function send(url, shot) {
     return new Promise(async (resolve, reject) => {
-
         // 请求
-        fetch(`http://localhost:9000/app/${url}/play/${shot}`)
+        fetch(`http://localhost:5000/app/${url}/play/${shot}`)
             .then(res => {
                 return res.json();
             })
@@ -162,7 +157,20 @@ function send(url, shot) {
                 // result = res
                 resolve(res);
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                console.error("Error:", error)
+                msg('server error')
+            });
     })
 
+}
+
+
+function msg(text) {
+    hint.textContent = text
+    hint__shade.style.display = 'block'
+
+    setTimeout(() => {
+        hint__shade.style.display = 'none'
+    }, 1000);
 }
