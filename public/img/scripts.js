@@ -2,66 +2,68 @@
 // check out the coin-server example from a previous COMP 426 semester.
 // https://github.com/jdmar3/coinserver
 
-function toggleMoveOptions() {
-    let opponentChecked = document.getElementById('opponent').checked;
-    let selectedGameType = document.querySelector('input[name="game-type"]:checked').id;
-
-    if (opponentChecked && selectedGameType === 'rpsls') {
+function unhideOpts() {
+    let check = document.getElementById('opponent');
+    let gameType = document.querySelector('input[name="game-type"]:checked').id;
+    
+    if (check.checked && gameType === 'rpsls') {
         $('.move').show();
         $('.rpsls').show();
         $('.rps').show();
-    } else if (opponentChecked && selectedGameType === 'rps') {
+      } else if (check.checked && gameType === 'rps') {
         $('.move').show();
         $('.rps').show();
         $('.rpsls').hide();
-    } else {
+      } else {
         $('.move').hide();
-    }
-    console.log(selectedGameType);
-    console.log(opponentChecked);
+      }
+      console.log(gameType);
+      console.log(check.checked);
 }
 
-function clearAndReset() {
+function resetClear() {
     document.getElementById('userinput').reset();
     $('#results').hide();
     $('#userinput').show();
     $('#play').show();
-    toggleMoveOptions();
+    unhideOpts();
 }
 
-async function playGame() {
+async function startGame() {
     $('#userinput').hide();
     $('#play').hide();
 
     let gameType = $('input[type=radio][name=game-type]:checked').val();
-    let againstOpponent = document.querySelector('#opponent').checked;
-    let chosenMove = $('input[type=radio][name=move]:checked').val();
+    let vsOpponent = document.querySelector('#opponent').checked;
+    let shot = $('input[type=radio][name=move]:checked').val();
 
-    let baseURL = window.location.href + 'app/'
-    let requestURL = baseURL + gameType + '/play'
+    let baseurl = window.location.href + 'app/'
+    let url = baseurl + gameType + '/play'
 
-    if (againstOpponent) {
-        requestURL += '/' + chosenMove
+    if (vsOpponent) {
+        url += '/' + shot
     }
 
-    let response = await fetch(requestURL);
-    let gameOutcome = await response.json();
+    let response = await fetch(url)
+    let result = await response.json()
 
-    if (againstOpponent) {
+    if (vsOpponent) {
         $('#results').show();
-        document.getElementById("results").innerText = 'You: ' + gameOutcome.player +
-            '\n\nYour opponent: ' + gameOutcome.opponent +
-            '\n\nResult: you ' + gameOutcome.result.toUpperCase() +'\n';
+        document.getElementById("results").innerText = 'You: ' + result.player +
+            '\n\nYour opponent: ' + result.opponent +
+            '\n\nResult: you ' + result.result.toUpperCase() +'\n';
     } else {
         $('#results').show();
-        document.getElementById("results").innerText = 'Your random draw is: ' + gameOutcome.opponent;
+        document.getElementById("results").innerText = 'Your random draw is: ' + result.opponent;
     }
-    console.log(requestURL);
-    console.log(gameOutcome);
-    console.log(gameOutcome.result);
+    console.log(url)
+    console.log(result)
+    console.log(result.result)
+
+
 }
 
-function displayRules() {
+function viewrules() {
     document.getElementById("rules").innerText =
     `Rules for Rock Paper Scissors:
     - Scissors CUTS Paper
@@ -84,7 +86,7 @@ function displayRules() {
     document.getElementById("hide-rules-btn").hidden = false;
 }
 
-function hideRules() {
+function hiderules() {
     document.getElementById("rules").hidden = true;
     document.getElementById("hide-rules-btn").hidden = true;
     document.getElementById("rules-btn").hidden = false;
