@@ -1,82 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Rock</title>
-    <meta name="viewport" content="width=device-width,initial-sacle=1.0,  minimum-scale=1.0">
-    <!-- Link to your script file(s) and CSS in here somewhere -->
-    <link rel="stylesheet" href="./styles.css">
-    <script src="./scripts.js"></script>
-</head>
-
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>YUQI SHENG Final Project RPSLS</title>
+        <!-- Link to your script file(s) and CSS in here somewhere -->
+        <link rel="stylesheet" href="styles.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="scripts.js"></script>
+    </head>
     <!-- Your interface markup goes here -->
     <!-- For interface examples, look in the `/examples/` directory in the root of your starter code repo. -->
-    <div class="content">
-        <div id="optionsPage">
-            <ul>
-                <li>
-                    <input type="radio" id="rock" name="gameType" onclick="isOption('gameTypeRock')">
-                    <label for="rock"> Play Rock, Paper, Scissors? </label>
-                </li>
-
-                <li>
-                    <input type="radio" id="spock" name="gameType" onclick="isOption('gameTypeSpock')">
-                    <label for="spock">
-                        Play Rock, Paper, Scissors, Lizard, Spock?
+    <body onload="unhideOpts()">
+        <h1>Rock Paper Scissors Lizard Spock</h1>
+        <form id="userinput" class="" action="javascript:void(0);">
+            <fieldset>
+                <legend>Select Game Type:</legend>
+                    <label>
+                        <input type="radio" id="rps" name="game-type" value="rps" checked onclick="unhideOpts()">
+                        Rock Paper Scissors
                     </label>
-                </li>
+                    <label>
+                        <input type="radio" id="rpsls" name="game-type" value="rpsls" onclick="unhideOpts()">
+                        Rock Paper Scissors Lizard Spock
+                    </label>
+            </fieldset>
+            <fieldset>
+                <legend>Play vs an Opponent?</legend>
+                    <label>
+                        <input type="checkbox" id="opponent" name="play-mode" value="opponent" onclick="unhideOpts()">
+                        Yes
+                    </label>
+            </fieldset>
 
-                <li class="opponent">
-                    <input type="radio" id="opponent" name="opponent" onclick="isOption('opponent')">
-                    <label for="opponent"> Play against an opponent? </label>
-                </li>
-            </ul>
+            <h2 class="move rps rpsls">Select Your Move:</h2>
+                <label class="move rps"><input type="radio" name="move" value="rock" class="move rps" checked>Rock</label>
+                <figure id="rockpic" class="move rps"><img src="./img/rock.jpg" height="60" width="60" alt="rock"></figure>
+                <label class="move rps"><input type="radio" name="move" value="paper" class="move rps" checked>Paper</label>
+                <figure id="paperpic" class="move rps"><img src="./img/paper.jpg" height="60" width="60" alt="paper"></figure>
+                <label class="move rps"><input type="radio" name="move" value="scissors" class="move rps" checked>Scissors</label>
+                <figure id="scissorspic" class="move rps"><img src="./img/scissors.jpg" height="60" width="60" alt="scissors"></figure>
+                <label class="move rpsls"><input type="radio" name="move" value="lizard" class="move rpsls" checked>Lizard</label>
+                    <figure id="lizardpic" class="move rpsls"><img src="./img/lizard.jpg" height="60" width="60" alt="lizard"></figure>
+                <label class="move rpsls"><input type="radio" name="move" value="spock" class="move rpsls" checked>Spock</label>
+                    <figure id="spockpic" class="move rpsls"><img src="./img/spock.jpg" height="60" width="60" alt="spock"></figure>
+        <button type="submit" hidden>Submit</button>
+        </form>
 
-            <ul>
-                <li class="rockType">
-                    <input type="radio" id="Rock" name="gestureType" onclick="isOption('gestureTypeRock')">
-                    <label for="Rock"> Rock </label>
-                </li>
-                <li class="rockType">
-                    <input type="radio" id="Paper" name="gestureType" onclick="isOption('gestureTypePaper')">
-                    <label for="Paper"> Paper </label>
-                </li>
-                <li class="rockType">
-                    <input type="radio" id="Scissors" name="gestureType" onclick="isOption('gestureTypeScissors')">
-                    <label for="Scissors"> Scissors </label>
-                </li>
-                <li class="spockType">
-                    <input type="radio" id="Lizard" name="gestureType" onclick="isOption('gestureTypeLizard')">
-                    <label for="Lizard"> Lizard </label>
-                </li>
-                <li class="spockType">
-                    <input type="radio" id="Spock" name="gestureType" onclick="isOption('gestureTypeSpock')">
-                    <label for="Spock"> Spock </label>
-                </li>
-            </ul>
+        <button type="button" id="play" onclick="startGame()">Start Game</button>
+        <br><br>
+        <button type="button" id="clear" onclick="resetClear()">Restart Game</button>
+        <br><br>
+
+        <div>
+            <div id="results"></div>
         </div>
-
-        <div class="resultPage" id="resultPage">
-            <ul>
-                <li>You: <span id="you" class="text"></span></li>
-                <li>Your opponent: <span id="youOpponent" class="text"></span></li>
-                <li>Result: <span id="result" class="text"></span></li>
-            </ul>
-        </div>
-
-        <div class="fixed">
-            <div class="btns">
-                <div class="btn" id="playBtn" onclick="play()">PLAY</div>
-                <div class="btn startOver" onclick="startOver()">START OVER</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="hint__shade" id="hint__shade">
-        <div class="hint" id="hint"></div>
-    </div>
-</body>
-
+        <fieldset>
+            <legend>Rules</legend>
+                <button type="button" id="rules-btn" onclick="viewrules()">View Rules</button>
+                <div id="rules" hidden></div>
+                <br>
+                <button type="button" id="hide-rules-btn" onclick="hiderules()" hidden>Hide Rules</button>
+        </fieldset>
+    </body>
 </html>
