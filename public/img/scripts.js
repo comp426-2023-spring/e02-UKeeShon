@@ -2,175 +2,90 @@
 // check out the coin-server example from a previous COMP 426 semester.
 // https://github.com/jdmar3/coinserver
 
+function toggleMoveOptions() {
+    let opponentChecked = document.getElementById('opponent').checked;
+    let selectedGameType = document.querySelector('input[name="game-type"]:checked').id;
 
-// type of play
-let gameType = null
-
-// Whether to play against an opponent
-let isOpponent = null
-
-// Gesture type
-let gestureType = null
-
-function isOption(param) {
-    switch (param) {
-        // type of play
-        case 'gameTypeRock':
-            gameType = 'gameTypeRock'
-            document.querySelectorAll('.rockType')
-                .forEach((d) => {
-                    d.style.display = 'block'
-                })
-            document.querySelectorAll('.spockType')
-                .forEach((d) => {
-                    d.style.display = 'none'
-                })
-            break;
-        case 'gameTypeSpock':
-            gameType = 'gameTypeSpock'
-            document.querySelectorAll('.rockType')
-                .forEach((d) => {
-                    d.style.display = 'block'
-                })
-            document.querySelectorAll('.spockType')
-                .forEach((d) => {
-                    d.style.display = 'block'
-                })
-            break;
-
-        // Whether to play against an opponent
-        case 'opponent':
-            isOpponent = 'opponent'
-            break;
-
-        // Gesture type
-        case 'gestureTypeRock':
-            gestureType = 'rock'
-            break;
-        case 'gestureTypePaper':
-            gestureType = 'paper'
-            break;
-        case 'gestureTypeScissors':
-            gestureType = 'scissors'
-            break;
-        case 'gestureTypeLizard':
-            gestureType = 'lizard'
-            break;
-        case 'gestureTypeSpock':
-            gestureType = 'spock'
-            break;
-
+    if (opponentChecked && selectedGameType === 'rpsls') {
+        $('.move').show();
+        $('.rpsls').show();
+        $('.rps').show();
+    } else if (opponentChecked && selectedGameType === 'rps') {
+        $('.move').show();
+        $('.rps').show();
+        $('.rpsls').hide();
+    } else {
+        $('.move').hide();
     }
+    console.log(selectedGameType);
+    console.log(opponentChecked);
 }
 
-function play() {
-    const you = document.getElementById('you')
-    const youOpponent = document.getElementById('youOpponent')
-    const result = document.getElementById('result')
-
-    const optionsPage = document.getElementById('optionsPage')
-    const resultPage = document.getElementById('resultPage')
-    const playBtn = document.getElementById('playBtn')
-
-    const hint = document.getElementById('hint')
-    const hint__shade = document.getElementById('hint__shade')
-
-    if (gameType == null) {
-        msg('Please select the game')
-        return
-    }
-
-    if (gestureType == null) {
-        msg('Please select gesture')
-        return
-    }
-
-    if (gameType != null && gestureType != null) {
-
-        if (gameType === 'gameTypeRock') {
-            send('rps', gestureType).then(res => {
-                you.textContent = res.player
-                youOpponent.textContent = res.opponent
-                result.textContent = res.result
-
-                optionsPage.style.display = 'none'
-                resultPage.style.display = 'block'
-                playBtn.style.display = 'none'
-            })
-        }
-
-        if (gameType === 'gameTypeSpock') {
-            send('rpsls', gestureType).then(res => {
-                you.textContent = res.player
-                youOpponent.textContent = res.opponent
-                result.textContent = res.result
-
-
-                optionsPage.style.display = 'none'
-                resultPage.style.display = 'block'
-                playBtn.style.display = 'none'
-            })
-        }
-
-
-    }
-
-
+function clearAndReset() {
+    document.getElementById('userinput').reset();
+    $('#results').hide();
+    $('#userinput').show();
+    $('#play').show();
+    toggleMoveOptions();
 }
 
-// deselect
-function startOver() {
-    gameType = null
-    isOpponent = null
-    gestureType = null
+async function playGame() {
+    $('#userinput').hide();
+    $('#play').hide();
 
-    const gameTypeRadio = document.querySelector('input[type=radio][name=gameType]:checked')
-    const opponentRadio = document.querySelector('input[type=radio][name=opponent]:checked')
-    const gestureTypeRadio = document.querySelector('input[type=radio][name=gestureType]:checked')
-    if (gameTypeRadio) gameTypeRadio.checked = false;
-    if (opponentRadio) opponentRadio.checked = false;
-    if (gestureTypeRadio) gestureTypeRadio.checked = false;
+    let gameType = $('input[type=radio][name=game-type]:checked').val();
+    let againstOpponent = document.querySelector('#opponent').checked;
+    let chosenMove = $('input[type=radio][name=move]:checked').val();
 
-    document.querySelectorAll('.rockType')
-        .forEach((d) => {
-            d.style.display = 'none'
-        })
-    document.querySelectorAll('.spockType')
-        .forEach((d) => {
-            d.style.display = 'none'
-        })
+    let baseURL = window.location.href + 'app/'
+    let requestURL = baseURL + gameType + '/play'
 
+    if (againstOpponent) {
+        requestURL += '/' + chosenMove
+    }
 
-    document.getElementById('optionsPage').style.display = 'block'
-    document.getElementById('resultPage').style.display = 'none'
-    document.getElementById('playBtn').style.display = 'block'
+    let response = await fetch(requestURL);
+    let gameOutcome = await response.json();
+
+    if (againstOpponent) {
+        $('#results').show();
+        document.getElementById("results").innerText = 'You: ' + gameOutcome.player +
+            '\n\nYour opponent: ' + gameOutcome.opponent +
+            '\n\nResult: you ' + gameOutcome.result.toUpperCase() +'\n';
+    } else {
+        $('#results').show();
+        document.getElementById("results").innerText = 'Your random draw is: ' + gameOutcome.opponent;
+    }
+    console.log(requestURL);
+    console.log(gameOutcome);
+    console.log(gameOutcome.result);
 }
 
-function send(url, shot) {
-    return new Promise(async (resolve, reject) => {
-        // 请求
-        fetch(`http://localhost:5000/app/${url}/play/${shot}`)
-            .then(res => {
-                return res.json();
-            })
-            .then(res => {
-                // result = res
-                resolve(res);
-            })
-            .catch(error => {
-                console.error("Error:", error)
-                msg('server error')
-            });
-    })
-
+function displayRules() {
+    document.getElementById("rules").innerText =
+    `Rules for Rock Paper Scissors:
+    - Scissors CUTS Paper
+    - Paper COVERS Rock
+    - Rock CRUSHES Scissors
+    
+    Rules for the Lizard-Spock Expansion of Rock Paper Scissors:
+    - Scissors CUTS Paper
+    - Paper COVERS Rock
+    - Rock SMOOSHES Lizard
+    - Lizard POISONS Spock
+    - Spock SMASHES Scissors
+    - Scissors DECAPITATES Lizard
+    - Lizard EATS Paper
+    - Paper DISPROVES Spock
+    - Spock VAPORIZES Rock
+    - Rock CRUSHES Scissors`;
+    document.getElementById("rules-btn").hidden = true;
+    document.getElementById("rules").hidden = false;
+    document.getElementById("hide-rules-btn").hidden = false;
 }
 
-
-function msg(text) {
-    hint.textContent = text
-    hint__shade.style.display = 'block'
-
-    setTimeout(() => {
-        hint__shade.style.display = 'none'
-    }, 1000);
+function hideRules() {
+    document.getElementById("rules").hidden = true;
+    document.getElementById("hide-rules-btn").hidden = true;
+    document.getElementById("rules-btn").hidden = false;
 }
